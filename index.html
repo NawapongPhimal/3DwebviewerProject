@@ -1,0 +1,50 @@
+<!DOCTYPE html>
+<html lang="en">
+    <head>
+        <meta charset="UTF-8">
+        <meta name="viewport" content="width=device-width, initial-scale=1.0">
+        <title>3D MODEL VIEWER</title>
+        <link rel="stylesheet" href="index.css">
+        <link href="https://fonts.googleapis.com/css2?family=Roboto:wght@400;500&display=swap" rel="stylesheet">
+        <link href="https://fonts.googleapis.com/css2?family=Montserrat:wght@400;500&display=swap" rel="stylesheet">
+        <script src="https://unpkg.com/browse/es-module-shims@1.8.1//dist/es-module-shims.js"></script>
+        <script src="https://cdnjs.cloudflare.com/ajax/libs/three.js/r128/three.min.js"></script>
+        <script type="importmap">
+            {
+                "imports":{
+                    "three": "https://unpkg.com/three@v0.153.0/build/three.module.js",
+                    "three/addons/": "https://unpkg.com/three@0.158.0/examples/jsm/"
+                }
+            }
+        </script>
+    </head>
+    <body>
+        <div id="heading">
+            <h1>3D MODEL VIEWER</h1>
+            <div class="border"></div>
+        </div>
+        <div id="buttonContainer">
+            <div class="upload-btn-wrapper">
+                <label for="file-upload" class="btn">Upload Model</label>
+                <input id="file-upload" type="file" name="myfile" accept=".glb, .gltf, .fbx"/>
+            </div>
+            <button id="removeModel" class="btn">Remove Model</button>
+            <button id="exportModel" class="btn">Export Model</button>
+        </div>
+        <div class="file-name">No model selected</div>
+                
+        <script>
+        document.getElementById('file-upload').onchange = function () {
+            var fileName = this.value.split('\\').pop();
+            document.querySelector('.file-name').textContent = fileName;
+        };
+        </script>
+        <script>
+        document.getElementById('removeModel').addEventListener('click', function() {
+            document.querySelector('.file-name').textContent = "No model selected";
+            document.getElementById('file-upload').value = "";
+        });
+        </script>
+        <script type="module" src="./main.js"></script>
+    </body>
+</html>

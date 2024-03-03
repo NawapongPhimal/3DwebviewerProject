@@ -24,19 +24,21 @@ document.body.appendChild(renderer.domElement);
 //scene
 const scene = new THREE.Scene();
 
-//camera
-const camera = new THREE.PerspectiveCamera(45, window.innerWidth / window.innerHeight, 1, 1000);
-camera.position.set(4, 5, 11);
-
+// Camera
+const camera = new THREE.PerspectiveCamera(45, window.innerWidth / window.innerHeight, 0.1, 5000);
+camera.position.set(0, 30, 100);
 const cameraControls = {
     lockCamera: false,
 };
-
+camera.near = 1;
+camera.far = 1000; // Adjust based on the scene's size
+camera.updateProjectionMatrix();
 
 //control
 const controls = new OrbitControls(camera, renderer.domElement);
 controls.enableDamping = true;
 controls.enablePan = false;
+controls.enableZoom = true;
 controls.minDistance = 5;
 controls.maxDistance = 20;
 controls.minPolarAngle = 0.5;
@@ -47,11 +49,12 @@ controls.update();
 
 //----------------------------------------------------------------------------------------------------//
 
-const groundGeometry = new THREE.PlaneGeometry(20, 20, 32, 32);
+//ground
+const groundGeometry = new THREE.PlaneGeometry(20, 20, 1, 1); // Fewer divisions
 groundGeometry.rotateX(-Math.PI / 2);
 const groundMaterial = new THREE.MeshStandardMaterial({
-    color: 0x000000,
-    side: THREE.Doubleside
+  color: 0x000000,
+  side: THREE.DoubleSide
 });
 
 //----------------------------------------------------------------------------------------------------//
@@ -76,15 +79,25 @@ const directionalLight = new THREE.DirectionalLight(0xFFFFFF, 1);
 scene.add(directionalLight);
 directionalLight.position.set(18, 11, 7);
 
-// grid
-let gridHelper;
+//test plane mesh
+const planeMesh = new THREE.Mesh(
+  new THREE.PlaneGeometry(20 ,20),
+  new THREE.MeshBasicMaterial({
+    side: THREE.DoubleSide,
+    visible: false
+  })
+);
+planeMesh.rotateX(-Math.PI / 2);
+scene.add(planeMesh);
+
+//grid
+let grid;
 
 function initGridHelper() {
-    gridHelper = new THREE.GridHelper(100, 70);
-    gridHelper.visible = false;
-    scene.add(gridHelper);
+  grid = new THREE.GridHelper(20, 20);
+  grid.visible = false;
+  scene.add(grid);
 }
-
 initGridHelper();
 
 // Function to update wireframe visibility for all mesh materials in the model
@@ -183,7 +196,7 @@ function toggleTransformControlsVisibility(value) {
 
 // Add Show Grid checkbox to GUI
 gui.add(options, 'showGrid').name('Show Grid').onChange(function(value) {
-  gridHelper.visible = value;
+  grid.visible = value; // This will now correctly reference the global grid variable
 });
 
 //----------------------------------------------------------------------------------------------------//
@@ -219,12 +232,6 @@ Object.keys(modelConfig).forEach((modelName) => {
   folder.add(modelConfig, `${modelName}`).name(`${modelName}`);
   folder.add(deleteButton, 'delete').name(`Delete ${modelName}`);
 });
-
-// folder.add(modelConfig, 'Deer').name('Deer');
-// folder.add(modelConfig, 'Cow').name('Cow');
-// folder.add(modelConfig, 'Horse').name('Horse');
-// folder.add(modelConfig, 'Alpaca').name('Alpaca');
-
 //----------------------------------------------------------------------------------------------------//
 
 function uploadModel(modelPath, modelName) {
@@ -546,7 +553,7 @@ function animate() {
     if (!cameraControls.lockCamera) {
         controls.update();
     }
-
+    controls.update();
     renderer.render(scene, camera);
 }
 
@@ -582,9 +589,9 @@ progressBarDiv.style.width = '100%';
 progressBarDiv.style.textAlign = 'center';
 
 function onWindowResize() {
-    camera.aspect = window.innerWidth / window.innerHeight;
-    camera.updateProjectionMatrix();            
-    renderer.setSize( window.innerWidth, window.innerHeight );            
+  camera.aspect = window.innerWidth / window.innerHeight;
+  camera.updateProjectionMatrix();            
+  renderer.setSize(window.innerWidth, window.innerHeight);            
 }
 
 //----------------------------------------------------------------------------------------------------//
